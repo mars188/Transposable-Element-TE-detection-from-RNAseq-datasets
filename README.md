@@ -19,7 +19,7 @@ To summarize, we will:
 - Performs differential expression analysis on TEs
 
 ## Connecting to the HPC using a MAC/Linux machine and copying the data
-Open the "Terminal" app and type **ssh NetID@jubail.abudhabi.nyu.edu** Enter your NYU password when prompted and hit enter.
+Open the "Terminal" app and type (ssh NetID@jubail.abudhabi.nyu.edu) Enter your NYU password when prompted and hit enter.
 Once logged in, navigate to your personal "SCRATCH" directory or the any other subdirecotry where you want to run this workshop. 
 
 
