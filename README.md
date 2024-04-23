@@ -1,2 +1,2 @@
-**Transposable-Element-TE-detection-from-RNAseq-datasets**
+# Transposable-Element-TE-detection-from-RNAseq-datasets
 
