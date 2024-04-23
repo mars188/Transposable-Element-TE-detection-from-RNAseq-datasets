@@ -37,3 +37,10 @@ mkdir -p /scratch/$USER/TE_workshop
 cd /scratch/$USER/TE_workshop
 rsync -avP /scratch/ma5877/TE_workshop/data_files/ .
 ```
+## The data
+After performing the above action, you will find the following files in your directory
+1. squire_fetch: This contains the Repeatmasker, annotation , chromosome fasta files downloaded from UCSC for mouse genome (mm9)
+2. squire_clean: Filtered repeatmasker file for repeats of interest after collapsing overlapping repeats. We obtained these files by preforming **squire_clean** step from the workflow. We have already performed this step and you don't have to repeat.   
+3. trimmed_reads: This directory contains the dataset that we will be using for this workshop, which are quality trimmed FASTQ sequencing files. They are publicly available to download from the Short Read Archive (SRA [https://www.ncbi.nlm.nih.gov/sra]) using the following accessions ERR674822, SRR24555542, SRR5604284. Our p1, p2, and p3 datasets are reduced from their original size, meaning that not all of the sequencing reads are available. The reason for this is due to time constraints. Running the complete dataset takes much longer than the time we have during this workshop.
+
+As mentioned earlier, each one of you has been preallocated a particular dataset. Your task is to complete the analysis of this data and find out which one of the "case files" relates to the dataset that you have been given.
