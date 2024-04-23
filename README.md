@@ -95,3 +95,23 @@ module load gencore_biosails
 biox run -w te_squire.yml --select_rules squire_call -o call.sh
 hpcrunner.pl submit_jobs -i call.sh
 ```
+Complete script
+```
+squire Call \
+-1 liver_29m* \
+-2 liver_3m* \
+-A 29m -B 3m \
+-i {$squire_count \
+-o {$squire_call/locus \
+-p 24 \
+-v && \
+squire Call \
+-1 liver_29m* \
+-2 liver_3m* \
+-A 29m -B 3m \
+-i {$squire_count \
+-o {$squire_call/subfamily \
+-s \
+-p 24 \
+-v
+```
