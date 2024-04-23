@@ -27,4 +27,13 @@ To summarize, we will:
 ## Connecting to the HPC using a Windows machine and copying the data.
 - Open the "Putty" app, and fill out the fields as follows Host name jubail.abudhabi.nyu.edu, Port=22, and then click on "Open".
 - Enter your NetId, and your password when prompted.
-- Once logged in, navigate to your personal "SCRATCH" directory or the any other subdirecotry where you want to run this workshop. 
+- Once logged in, navigate to your personal "SCRATCH" directory or the any other subdirecotry where you want to run this workshop.
+  
+## Setting up the environment and copying the data
+We will be using the NYUAD High Performance Computing (HPC) cluster for this workshop, however, you can certainly run all of the analysis on any stand alone machine (server, personal laptop/Desktop etc.) provided that you have pre-installed the necessay software packages.
+
+```
+mkdir -p /scratch/$USER/TE_workshop
+cd /scratch/$USER/TE_workshop
+rsync -avP /scratch/ma5877/TE_workshop/data_files/ .
+```
