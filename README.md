@@ -75,6 +75,18 @@ module load gencore_biosails
 biox run -w te_squire.yml --select_rules squire_count -o count.sh
 hpcrunner.pl submit_jobs -i count.sh
 ```
+Complete script
+```
+squire Count \
+-m {$squire_map} \
+-c {$squire_clean \
+-o {$squire_count \
+-f {$squire_fetch \
+-r 65 \
+-b mm9 \
+-p 24 \
+-v
+```
 ## Step 3: Performs differential expression analysis on TEs
 ```
 module load gencore
