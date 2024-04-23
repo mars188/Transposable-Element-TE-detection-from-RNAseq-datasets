@@ -1,4 +1,4 @@
-**Transposable Element (TE) detection from RNAseq datasets**
+# Transposable Element (TE) detection from RNAseq datasets
 
 This page describes the steps to perform the NYUAD Core Bioinformatics hands-on workshop on TE detection from RNA-seq dataset and visulizing the results. 
 
