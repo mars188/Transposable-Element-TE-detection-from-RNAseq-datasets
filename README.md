@@ -1,4 +1,4 @@
-![image](https://github.com/mars188/Transposable-Element-TE-detection-from-RNAseq-datasets/assets/59919950/1817afcc-64c2-4f7e-9cc9-d4920ac40385)# Transposable-Element-TE-detection-from-RNAseq-datasets
+**Transposable Element (TE) detection from RNAseq datasets**
 
 This page describes the steps to perform the NYUAD Core Bioinformatics hands-on workshop on TE detection from RNA-seq dataset and visulizing the results. 
 
