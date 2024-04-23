@@ -13,7 +13,7 @@ We will start off with fastq files sequencing files that are already quality tri
 To summarize, we will:
 
 - Work on already quality trimmed reads 
-- Neccessary files (Repeatmasker, annotation file, chromosome fasta file, STAR index) needed for the analysis has already been downloaded and available in your folder.  
+- Neccessary files (Repeatmasker, annotation file, STAR index) needed for the analysis has already been downloaded and available in your folder.  
 - Align the data to the reference mouse genome (version mm9).
 - Count/Quantify RNAseq reads aligning to TEs
 - Performs differential expression analysis on TEs
