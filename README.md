@@ -1,4 +1,4 @@
-# Transposable-Element-TE-detection-from-RNAseq-datasets
+![image](https://github.com/mars188/Transposable-Element-TE-detection-from-RNAseq-datasets/assets/59919950/1817afcc-64c2-4f7e-9cc9-d4920ac40385)# Transposable-Element-TE-detection-from-RNAseq-datasets
 
 This page describes the steps to perform the NYUAD Core Bioinformatics hands-on workshop on TE detection from RNA-seq dataset and visulizing the results. 
 
@@ -10,14 +10,10 @@ Although the material and the methods are designed to cater for the NYU Abu Dhab
 
 We will start off with fastq files sequencing files that are already quality trimmed (Illumina paired end short reads), and throughout the course of the workshop, we will learn how to process and analyze the data so that we end up with readcounts files that can be further used for making graphs and visulizing results. Moving forward, we will use the publically available mouse data downloaded from Benayoun et al. 2019 and can be found here. (https://genome.cshlp.org/content/29/4/697). 
 
-More specifically, we will:
+To summarize, we will:
 
-Work on already quality trimmed reads 
-Neccessary files needed for 
-Align the data to the reference human genome (version HG38).
-Carry out the necessary alignment post processing steps following established best practice guides.
-Call variants (SNPs and Indels) and filter the variants that have been called.
-Annotate the Variants and attempt to establish causative mutations.
-By the end of this workshop, participants should be able to replicate these analysis steps on any DNA sequencing dataset (WGS/WES/Panels) originating from short read sequencing technologies.
-
-Enjoy!
+- Work on already quality trimmed reads 
+- Neccessary files (Repeatmasker, annotation file, chromosome fasta file, STAR index) needed for the analysis has already been downloaded and available in your folder.  
+- Align the data to the reference mouse genome (version mm9).
+- Count/Quantify RNAseq reads aligning to TEs
+- Performs differential expression analysis on TEs
