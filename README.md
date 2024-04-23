@@ -46,3 +46,12 @@ After performing the above action, you will find the following files in your dir
 
 **NOTE:** There are a total 6 FASTQ files. Three files belong to the young mice (3-month) and other three came from the old mice (29-month). We will use young mice as control group to detect the differential TE expression in old mice.  
 
+## Step 1: Aligns RNAseq reads
+```
+module load gencore
+module load gencore_biosails
+
+biox run -w te_squire.yml --select_rules squire_map -o map.sh
+hpcrunner.pl submit_jobs -i map.sh
+```
+
