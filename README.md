@@ -43,5 +43,6 @@ After performing the above action, you will find the following files in your dir
 2. squire_clean: Filtered repeatmasker file for repeats of interest after collapsing overlapping repeats. We obtained these files by preforming **squire_clean** step from the workflow. We have already performed this step and you don't have to repeat.   
 3. trimmed_reads: This directory contains the dataset that we will be using for this workshop, which are quality trimmed FASTQ sequencing files. They are from the **Aging epigenomics of male mice** and publicly available to download from the Short Read Archive (SRA [https://www.ncbi.nlm.nih.gov/sra]) using the following accessions SRS2248611, SRS2248612, SRS2248613, SRS2248599, SRS2248600, SRS2248601. These data have been downsized from their original dataset. The reason for this is due to time constraints. Running the complete dataset takes much longer than the time we have during this workshop.
 4. yml file: This is the workflow file that we will make use of to run the analysis.
+
 There are a total 6 FASTQ files. Three files belong to the young mice (3-month) and other three came from the old mice (29-month). We will use young mice as control group to detect the differential TE expression in old mice.  
 
