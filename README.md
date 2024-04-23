@@ -54,6 +54,19 @@ module load gencore_biosails
 biox run -w te_squire.yml --select_rules squire_map -o map.sh
 hpcrunner.pl submit_jobs -i map.sh
 ```
+
+Complete script 
+```
+squire Map \
+-1 {$READ1} \
+-2 {$READ2} \
+-o {$self->root_out_dir}/squire_map/{$sample} \
+-f {$self->root_out_dir}/squire_fetch \
+-b mm9 \
+-r 65 \
+-p 24 \
+-v
+```
 ## Step 2: Quantifies RNAseq reads aligning to TEs
 ```
 module load gencore
