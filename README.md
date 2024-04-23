@@ -1,4 +1,4 @@
-# Transposable Element (TE) detection from RNAseq datasets
+![image](https://github.com/mars188/Transposable-Element-TE-detection-from-RNAseq-datasets/assets/59919950/02c2d5b3-6313-4b75-8240-9a84b8e1dd15)# Transposable Element (TE) detection from RNAseq datasets
 
 This page describes the steps to perform the NYUAD Core Bioinformatics hands-on workshop on TE detection from RNA-seq dataset and visulizing the results. 
 
@@ -58,7 +58,15 @@ hpcrunner.pl submit_jobs -i map.sh
 ```
 module load gencore
 module load gencore_biosails
+
 biox run -w te_squire.yml --select_rules squire_count -o count.sh
 hpcrunner.pl submit_jobs -i count.sh
 ```
+## Step 3: Performs differential expression analysis on TEs
+```
+module load gencore
+module load gencore_biosails
 
+biox run -w te_squire.yml --select_rules squire_call -o call.sh
+hpcrunner.pl submit_jobs -i call.sh
+```
