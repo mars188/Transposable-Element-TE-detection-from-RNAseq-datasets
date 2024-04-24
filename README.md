@@ -55,7 +55,7 @@ acquire genomic input files or if a new build is desired.
 squire_clean: Filters Repeatmasker file for Repeats of interest, collapses overlapping repeats, and returns as BED file.
 Optional: Incorporation of non-reference TE sequence
 ```
-**NOTE:** For this workshop and to save the time, the data have already been downloaded and included in your data file.
+**NOTE:** For this workshop and to save the time, the data have already been downloaded and included in your data file. YOU DO NOT NEED TO RUN THIS STEP. 
 
 ## Step 1: Aligns RNAseq reads
 ```
