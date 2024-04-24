@@ -46,6 +46,9 @@ After performing the above action, you will find the following files in your dir
 
 **NOTE:** There are a total 6 FASTQ files. Three files belong to the young mice (3-month) and other three came from the old mice (29-month). We will use young mice as control group to detect the differential TE expression in old mice.  
 
+## Step 0: Downloading reference data from UCSC genome broswer / creating your own
+You will need to run *squire_fetch* and *squire_clean* commands to download and clean up the the refernece files.  
+**NOTE:** For this workshop and to save the time, the data have already been downloaded and included in your data file. 
 ## Step 1: Aligns RNAseq reads
 ```
 module load gencore
