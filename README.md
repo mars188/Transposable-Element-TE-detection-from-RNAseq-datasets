@@ -46,9 +46,14 @@ After performing the above action, you will find the following files in your dir
 
 **NOTE:** There are a total 6 FASTQ files. Three files belong to the young mice (3-month) and other three came from the old mice (29-month). We will use young mice as control group to detect the differential TE expression in old mice.  
 
-## Step 0: Downloading reference data from UCSC genome broswer / creating your own
-You will need to run *squire_fetch* and *squire_clean* commands to download and clean up the the refernece files.  
-**NOTE:** For this workshop and to save the time, the data have already been downloaded and included in your data file. 
+## Step 0 (Preparation stage): Downloading reference data from UCSC genome broswer / creating your own
+```
+You will need to run the following commands in order to download and clean up the the referenece data files. 
+squire_fetch: Downloads input files from RefGene and generates STAR index Only needs to be done once initially to acquire genomic input files or if a new build is desired.
+squire_clean: Filters Repeatmasker file for Repeats of interest, collapses overlapping repeats, and returns as BED file.
+Optional: Incorporation of non-reference TE sequence
+**NOTE:** For this workshop and to save the time, the data have already been downloaded and included in your data file.
+``` 
 ## Step 1: Aligns RNAseq reads
 ```
 module load gencore
