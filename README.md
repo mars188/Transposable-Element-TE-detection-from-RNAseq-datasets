@@ -136,6 +136,7 @@ View(SQuIRE_TOTcounts_locus)
 
 ## preparation of dataframe 
 ##########################################################################################
+```
 library("dplyr")
 library("tibble")
 SQuIRE_TOTcounts_locus <- SQuIRE_TOTcounts_locus %>%
@@ -147,6 +148,7 @@ SQuIRE_TOTcounts_locus <- SQuIRE_TOTcounts_locus %>%
          liver_29m_1 = liver_29m1_1.fastq, liver_29m_2 = liver_29m2_1.fastq, liver_29m_3 = liver_29m3_1.fastq) # rename columns as called
 View(SQuIRE_TOTcounts_locus)
 cts_SQuIRE_TOTcounts_locus <- as.matrix(SQuIRE_TOTcounts_locus)
+```
 
 ## preparation of annotation 
 ##########################################################################################
