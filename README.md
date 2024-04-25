@@ -131,9 +131,10 @@ squire Call \
 
 ## loading data 
 ##############################################################################
+```
 SQuIRE_TOTcounts_locus <- read.delim("./Input_Data/SQuIRE_gene_locusTE_counttable.txt")
 View(SQuIRE_TOTcounts_locus)
-
+```
 ## preparation of dataframe 
 ##########################################################################################
 ```
@@ -152,13 +153,15 @@ cts_SQuIRE_TOTcounts_locus <- as.matrix(SQuIRE_TOTcounts_locus)
 
 ## preparation of annotation 
 ##########################################################################################
+```
 condition <- factor(c(rep("liver_3m", 3), rep("liver_29m", 3)))
 coldata<- data.frame(row.names=colnames(cts_SQuIRE_TOTcounts_locus), condition)
 View(coldata)
-
+```
 ### should return TRUE
+```
 all(rownames(coldata) == colnames(cts_SQuIRE_TOTcounts_locus))
-
+```
 
 ### DEseq2 ###
 ##########################################################################################
