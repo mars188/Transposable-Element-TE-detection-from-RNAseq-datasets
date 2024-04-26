@@ -72,40 +72,34 @@ hpcrunner.pl submit_jobs -i map.sh
 Complete script 
 ```
 squire Map \
--1 {$READ1} \
--2 {$READ2} \
+**put forwrad read flag** {$READ1} \
+**put reverse read flag {$READ2} \
 -o {$self->root_out_dir}/squire_map/{$sample} \
 -f {$self->root_out_dir}/squire_fetch \
--b mm9 \
+**genome build** \
 -r 65 \
 -p 24 \
 -v
 ```
 ## Step 2: Quantifies RNAseq reads aligning to TEs
 ```
-module load gencore
-module load gencore_biosails
-
 biox run -w te_squire.yml --select_rules squire_count -o count.sh
 hpcrunner.pl submit_jobs -i count.sh
 ```
 Complete script
 ```
 squire Count \
--m {$squire_map} \
--c {$squire_clean \
+**flag for map folder** {$squire_map} \
+**flag for clean folder** {$squire_clean \
 -o {$squire_count \
--f {$squire_fetch \
+**flag for fetch folder** {$squire_fetch \
 -r 65 \
--b mm9 \
+**genome build** \
 -p 24 \
 -v
 ```
 ## Step 3: Performs differential expression analysis on TEs
 ```
-module load gencore
-module load gencore_biosails
-
 biox run -w te_squire.yml --select_rules squire_call -o call.sh
 hpcrunner.pl submit_jobs -i call.sh
 ```
@@ -114,7 +108,8 @@ Complete script
 squire Call \
 -1 liver_29m* \
 -2 liver_3m* \
--A 29m -B 3m \
+-A 29m \
+-B 3m \
 -i {$squire_count \
 -o {$squire_call/locus \
 -p 24 \
