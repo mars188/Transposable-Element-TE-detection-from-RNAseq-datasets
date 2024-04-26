@@ -61,6 +61,9 @@ Optional: Incorporation of non-reference TE sequence
 ```
 module load gencore
 module load gencore_biosails
+module load Miniconda3/
+source activate /scratch/gencore/conda3/envs/squire/
+squire -h
 
 biox run -w te_squire.yml --select_rules squire_map -o map.sh
 hpcrunner.pl submit_jobs -i map.sh
