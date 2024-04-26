@@ -157,14 +157,15 @@ cts_SQuIRE_TOTcounts_locus <- as.matrix(SQuIRE_TOTcounts_locus)
 condition <- factor(c(rep("liver_3m", 3), rep("liver_29m", 3)))
 coldata<- data.frame(row.names=colnames(cts_SQuIRE_TOTcounts_locus), condition)
 View(coldata)
-```
+
 ### should return TRUE
-```
+
 all(rownames(coldata) == colnames(cts_SQuIRE_TOTcounts_locus))
 ```
 
-### DEseq2 ###
+## DEseq2
 ##########################################################################################
+```
 library("DESeq2")
 dds_SQuIRE_TOTcounts_locus <- DESeqDataSetFromMatrix(countData = cts_SQuIRE_TOTcounts_locus,
                                                       colData = coldata,
@@ -173,8 +174,9 @@ dds_SQuIRE_TOTcounts_locus
 
 dds_SQuIRE_TOTcounts_locus <- DESeq(dds_SQuIRE_TOTcounts_locus)
 View(assay(dds_SQuIRE_TOTcounts_locus))
-
-# extract normalized counts
+```
+## extract normalized counts
+```
 library("dplyr")
 library("tibble")
 SQuIRE_normCounts_locus <- counts(dds_SQuIRE_TOTcounts_locus, normalized=TRUE)
@@ -187,29 +189,34 @@ df_SQuIRE_normCounts_locus_TE_only <- df_SQuIRE_normCounts_locus[26316:31963,]
 df_SQuIRE_normCounts_locus_TE_only <- df_SQuIRE_normCounts_locus_TE_only %>%
   rename(TE_ID = gene_id) # rename column using new_name = old_name syntax  
 View(df_SQuIRE_normCounts_locus_TE_only)
-# TE_ID contains concatenated TE_chr | TE_start | TE_stop| TE_name | milliDiv | TE_ strand
+```
+TE_ID contains concatenated TE_chr | TE_start | TE_stop| TE_name | milliDiv | TE_ strand
 
 # Variance stabilizing transformation
 ##########################################################################################
-# Get vsd for PCA
+## Get vsd for PCA
+```
 vsd_SQuIRE_TOTcounts_locus <- vst(dds_SQuIRE_TOTcounts_locus, blind=TRUE)
 vsd_SQuIRE_TOTcounts_locus_Gene_only <- vsd_SQuIRE_TOTcounts_locus[1:26315,]
 vsd_SQuIRE_TOTcounts_locus_TE_only <- vsd_SQuIRE_TOTcounts_locus[26316:31963,]
-
-# Principal Component Analysis on vst
+```
+## Principal Component Analysis on vst
+```
 plotPCA(vsd_SQuIRE_TOTcounts_locus, intgroup=c("condition"))
 plotPCA(vsd_SQuIRE_TOTcounts_locus_Gene_only, intgroup=c("condition"))
 plotPCA(vsd_SQuIRE_TOTcounts_locus_TE_only, intgroup=c("condition"))
-
-# export pdf plot on TE
+```
+## export pdf plot on TE
+```
 dir.create("./Results")
 dir.create("./Results/DEseq2")
 pdf("./Results/DEseq2/vsd_SQuIRE_TOTcounts_locus_TE_only.pdf", onefile = FALSE, paper = "special", width = 10, height = 7.5)
 plotPCA(vsd_SQuIRE_TOTcounts_locus_TE_only, intgroup=c("condition"))
 dev.off()
-
+```
 # compute Euclidian distance matrix 
 ##########################################################################################
+```
 sampleDists_SQuIRE_TOTcounts_locus <- dist(t(assay(vsd_SQuIRE_TOTcounts_locus)))
 sampleDists_SQuIRE_TOTcounts_locus_Gene_only <- dist(t(assay(vsd_SQuIRE_TOTcounts_locus[1:26315,])))
 sampleDists_SQuIRE_TOTcounts_locus_TE_only <- dist(t(assay(vsd_SQuIRE_TOTcounts_locus[26316:31963,])))
@@ -232,8 +239,9 @@ pheatmap(sampleDistMatrix_SQuIRE_TOTcounts_locus_TE_only,
          clustering_distance_rows=sampleDists_SQuIRE_TOTcounts_locus_TE_only,
          clustering_distance_cols=sampleDists_SQuIRE_TOTcounts_locus_TE_only,
          col=colors)
-
-# export pdf plot on TE
+```
+## export pdf plot on TE
+```
 pdf("./Results/DEseq2/sampleDistMatrix_SQuIRE_TOTcounts_locus_TE_only.pdf", onefile = FALSE, paper = "special", width = 10, height = 7.5)
 sampleDistMatrix_SQuIRE_TOTcounts_locus_TE_only <- as.matrix(sampleDists_SQuIRE_TOTcounts_locus_TE_only)
 pheatmap(sampleDistMatrix_SQuIRE_TOTcounts_locus_TE_only,
@@ -241,10 +249,11 @@ pheatmap(sampleDistMatrix_SQuIRE_TOTcounts_locus_TE_only,
          clustering_distance_cols=sampleDists_SQuIRE_TOTcounts_locus_TE_only,
          col=colors)
 dev.off()
-
-# calculate DEG 
-# the second group name represent the ctrl vs. which calculate difference
+```
+## calculate DEG 
+### the second group name represent the ctrl vs. which calculate difference
 ##########################################################################################
+```
 res_SQuIRE_TOTcounts_locus <- results(dds_SQuIRE_TOTcounts_locus, contrast = c("condition","liver_29m", "liver_3m"))
 res_SQuIRE_TOTcounts_locus
 summary(res_SQuIRE_TOTcounts_locus)
@@ -259,9 +268,10 @@ plotMA(res_SQuIRE_TOTcounts_locus_TE_only, ylim=c(-7,7), alpha = 0.05)
 pdf("./Results/DEseq2/res_SQuIRE_TOTcounts_locus_TE_only_MAplot.pdf", onefile = FALSE, paper = "special", width = 10, height = 7.5)
 plotMA(res_SQuIRE_TOTcounts_locus_TE_only, ylim=c(-7,7), alpha = 0.05)
 dev.off()
-
+```
 # export DEseq2 results
 ##########################################################################################
+```
 library("dplyr")
 library("tibble")
 SQuIRE_DESeq2_locus <- as.data.frame(res_SQuIRE_TOTcounts_locus)
@@ -273,43 +283,49 @@ SQuIRE_DESeq2_locus_TE_only <- SQuIRE_DESeq2_locus[26316:31963,]
 SQuIRE_DESeq2_locus_TE_only <- SQuIRE_DESeq2_locus_TE_only %>%
   rename(TE_ID = gene_id) # rename column using new_name = old_name syntax  
 View(SQuIRE_DESeq2_locus_TE_only)
-# TE_ID contains concatenated TE_chr | TE_start | TE_stop| TE_name | milliDiv | TE_ strand
+```
+TE_ID contains concatenated TE_chr | TE_start | TE_stop| TE_name | milliDiv | TE_ strand
 ##########################################################################################
 ##########################################################################################
-
 
 # preparation of merged dataframe 
 ##########################################################################################
-# merging with sort=FALSE keep the order of X list
+## merging with sort=FALSE keep the order of X list
+```
 DESeq2_normCounts_locus_TE_only <- merge(SQuIRE_DESeq2_locus_TE_only, df_SQuIRE_normCounts_locus_TE_only, by = "TE_ID", sort = FALSE)
 View(DESeq2_normCounts_locus_TE_only)
-
-# Separate a column in multiple column base on special characters
+```
+## Separate a column in multiple column base on special characters
+```
 library("dplyr")
 library("tidyr")
 DESeq2_normCounts_locus_TE_only <- DESeq2_normCounts_locus_TE_only %>% 
   separate(TE_ID, c("chr", "start", "end", "repName", "repFamily", "repClass", "milliDiv", "strand", "extra"), sep = "([|:,])", extra = "merge", fill = "right", remove = FALSE)
 View(DESeq2_normCounts_locus_TE_only)
-
-# count by Class of TE 
+```
+## count by Class of TE 
+```
 library("dplyr")
 DESeq2_normCounts_locus_TE_only_count <- DESeq2_normCounts_locus_TE_only %>%
   group_by(repClass) %>% count()
 View(DESeq2_normCounts_locus_TE_only_count)
-
-# subset by pvalue and count by Class of TE 
+```
+## subset by pvalue and count by Class of TE 
+```
 DESeq2_normCounts_locus_TE_only_pvalue005 <- subset(DESeq2_normCounts_locus_TE_only, pvalue< 0.05)
 View(DESeq2_normCounts_locus_TE_only_pvalue005)
 DESeq2_normCounts_locus_TE_only_pvalue005_count <- DESeq2_normCounts_locus_TE_only_pvalue005 %>%
   group_by(repClass) %>% count()
 View(DESeq2_normCounts_locus_TE_only_pvalue005_count)
-
-# subset by pvalue and by LTR repClass
+```
+## subset by pvalue and by LTR repClass
+```
 DESeq2_normCounts_locus_TE_only_pvalue005_LTR <- subset(DESeq2_normCounts_locus_TE_only, pvalue< 0.05 & repClass=="LTR")
 View(DESeq2_normCounts_locus_TE_only_pvalue005_LTR)
-
-# heatmap on normalized counts
+```
+## heatmap on normalized counts
 ##########################################################################################
+```
 library("pheatmap")
 dir.create("./Results/pheatmap")
 pdf("./Results/pheatmap/DESeq2_normCounts_locus_TE_only_pvalue005.pdf", onefile = FALSE, paper = "special", width = 7, height = 6)
@@ -321,10 +337,11 @@ pdf("./Results/pheatmap/DESeq2_normCounts_locus_TE_only_pvalue005_LTR.pdf", onef
 pheatmap(DESeq2_normCounts_locus_TE_only_pvalue005_LTR[,17:22], cluster_rows=TRUE, show_rownames=FALSE,
          cluster_cols=FALSE, scale = "row", labels_row = DESeq2_normCounts_locus_TE_only_pvalue005_LTR$repName)
 dev.off()
-
-# Enanched Volcano 
+```
+## Enanched Volcano 
 ##########################################################################################
-# prep color function based on repClass
+### prep color function based on repClass
+```
 keyvals.colour <- ifelse(
   DESeq2_normCounts_locus_TE_only$pvalue > 0.05 , 'grey80', # is a lighter grey
   ifelse(DESeq2_normCounts_locus_TE_only$repClass == "DNA", 'orange',
@@ -368,10 +385,11 @@ EnhancedVolcano(DESeq2_normCounts_locus_TE_only,
                 max.overlaps = 30,
                 colConnectors = 'black')
 dev.off()
+```
 
-
-# Annotation by genomation package
+## Annotation by genomation package
 ########################################################################################################################################
+```
 library("genomation")
 
 bed.file = "/Users/fm1442/Sadler Edepli Lab Dropbox/Filippo Macchi/BioInformatics/07_Utilities/Annotation_BED-files/refGene_Mmusulus_mm10.gz"
@@ -386,21 +404,24 @@ dir.create("./Results/Genomation")
 pdf("./Results/Genomation/annot_GR_DESeq2_normCounts_locus_TE_only.pdf", onefile = FALSE, paper = "special", width = 10, height = 7.5)
 plotTargetAnnotation(annot_GR_DESeq2_normCounts_locus_TE_only)
 dev.off()
-# take the numbers (with promoter > exon > intron precedence)
+```
+## take the numbers (with promoter > exon > intron precedence)
+```
 annot_GR_DESeq2_normCounts_locus_TE_only
-
 annot_GR_DESeq2_normCounts_locus_TE_only_pvalue005 = annotateWithGeneParts(GR_DESeq2_normCounts_locus_TE_only_pvalue005, gene.parts, strand=TRUE, intersect.chr=TRUE)
 pdf("./Results/Genomation/annot_GR_DESeq2_normCounts_locus_TE_only_pvalue005.pdf", onefile = FALSE, paper = "special", width = 10, height = 7.5)
 plotTargetAnnotation(annot_GR_DESeq2_normCounts_locus_TE_only_pvalue005)
 dev.off()
-# take the numbers (with promoter > exon > intron precedence)
+```
+## take the numbers (with promoter > exon > intron precedence)
+```
 annot_GR_DESeq2_normCounts_locus_TE_only_pvalue005
-
 annot_GR_DESeq2_normCounts_locus_TE_only_pvalue005_LTR = annotateWithGeneParts(GR_DESeq2_normCounts_locus_TE_only_pvalue005_LTR, gene.parts, strand=TRUE, intersect.chr=TRUE)
 pdf("./Results/Genomation/annot_GR_DESeq2_normCounts_locus_TE_only_pvalue005_LTR.pdf", onefile = FALSE, paper = "special", width = 10, height = 7.5)
 plotTargetAnnotation(annot_GR_DESeq2_normCounts_locus_TE_only_pvalue005_LTR)
 dev.off()
-# take the numbers (with promoter > exon > intron precedence)
+```
+## take the numbers (with promoter > exon > intron precedence)
 annot_GR_DESeq2_normCounts_locus_TE_only_pvalue005_LTR
 
 ##########################################################################################
