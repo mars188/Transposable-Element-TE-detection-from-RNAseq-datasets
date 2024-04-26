@@ -125,7 +125,7 @@ squire Call \
 -v
 ```
 
-# DEseq2 and Visualization of TE counted by SQuIRE Locus specific
+# PART 2: DEseq2 and Visualization of TE counted by SQuIRE Locus specific
 
 # loading data
 ##############################################################################
