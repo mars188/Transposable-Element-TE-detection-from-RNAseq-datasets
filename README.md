@@ -81,6 +81,7 @@ squire Map \
 -p 24 \
 -v
 ```
+
 ## Step 2: Quantifies RNAseq reads aligning to TEs
 ```
 biox run -w te_squire.yml --select_rules squire_count -o count.sh
