@@ -118,10 +118,11 @@ squire Call \
 squire Call \
 -1 liver_29m* \
 -2 liver_3m* \
--A 29m -B 3m \
+-A 29m \
+-B 3m \
 -i {$squire_count \
 -o {$squire_call/subfamily \
--s \
+**flag for subfamily level analysis** \
 -p 24 \
 -v
 ```
