@@ -76,9 +76,9 @@ squire Map \
 **put reverse read flag {$READ2} \
 -o {$self->root_out_dir}/squire_map/{$sample} \
 -f {$self->root_out_dir}/squire_fetch \
-**genome build** \
+**genome build** mm9 \
 -r 65 \
--p 24 \
+-p 14 \
 -v
 ```
 
@@ -95,8 +95,8 @@ squire Count \
 -o {$squire_count \
 **flag for fetch folder** {$squire_fetch \
 -r 65 \
-**genome build** \
--p 24 \
+**genome build** mm9 \
+**flag for threads** 14 \
 -v
 ```
 ## Step 3: Performs differential expression analysis on TEs
