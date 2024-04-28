@@ -37,6 +37,11 @@ mkdir -p /scratch/$USER/TE_workshop
 cd /scratch/$USER/TE_workshop
 rsync -avP /scratch/ma5877/TE_workshop/data_files/ .
 ```
+To access jubail web:
+```
+https://ood.hpc.abudhabi.nyu.edu
+```
+
 ## The data
 After performing the above action, you will find the following files in your directory
 1. squire_fetch: This contains the Repeatmasker, annotation , chromosome fasta files downloaded from UCSC for mouse genome (mm9)
