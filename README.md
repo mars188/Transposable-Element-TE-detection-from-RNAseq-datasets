@@ -133,7 +133,8 @@ squire Call \
 ```
 
 # PART 2: Data visulization 
-## A: DESeq2 and visualization of TE counted by SQuIRE grouped by SubFamily 
+## A: DESeq2 and visualization of TE counted by SQuIRE grouped by SubFamily
+
 
 ## loading packages environment
 ##############################################################################
@@ -397,7 +398,7 @@ dev.off()
 
 ## B: DESeq2 and Visualization of TE counted by SQuIRE Locus specific
 
-# loading data
+## loading data
 ##############################################################################
 ```
 SQuIRE_TOTcounts_locus <- read.delim("./Input_Data/SQuIRE_gene_locusTE_counttable.txt")
