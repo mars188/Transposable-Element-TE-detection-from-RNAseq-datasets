@@ -132,7 +132,270 @@ squire Call \
 -v
 ```
 
-# PART 2: DEseq2 and Visualization of TE counted by SQuIRE Locus specific
+# PART 2: Data visulization 
+## A: DESeq2 and visualization of TE counted by SQuIRE grouped by SubFamily 
+
+## loading packages environment
+##############################################################################
+```
+.libPaths("/scratch/gencore/software/RStudio/TE_workshop_R/lib/R/library")
+.libPaths()
+
+# set up working directories changing to your netID
+setwd("/scratch/netID/TE_workshop/Analysis_Visualization")
+```
+
+## loading data
+##############################################################################
+```
+SQuIRE_TOTcounts_family <- read.delim("./Input_Data/SQuIRE_gene_subF_counttable.txt")
+View(SQuIRE_TOTcounts_family)
+```
+
+## preparation of dataframe
+##########################################################################################
+```
+library("dplyr")
+library("tibble")
+SQuIRE_TOTcounts_family <- SQuIRE_TOTcounts_family %>%
+  remove_rownames() %>% # this is needed if dataframe has been filtered already so the picked row numbers are considered rownames
+  column_to_rownames(var = "gene_id") %>% # move specific columns as rownames
+  select(liver_3m1_1.fastq, liver_3m2_1.fastq, liver_3m3_1.fastq,
+         liver_29m1_1.fastq, liver_29m2_1.fastq, liver_29m3_1.fastq) %>% # reorder columns as called
+  rename(liver_3m_1 = liver_3m1_1.fastq, liver_3m_2 = liver_3m2_1.fastq, liver_3m_3 = liver_3m3_1.fastq,
+         liver_29m_1 = liver_29m1_1.fastq, liver_29m_2 = liver_29m2_1.fastq, liver_29m_3 = liver_29m3_1.fastq) # rename columns as called
+View(SQuIRE_TOTcounts_family)
+cts_SQuIRE_TOTcounts_family <- as.matrix(SQuIRE_TOTcounts_family)
+```
+
+## preparation of annotation
+##########################################################################################
+```
+condition <- factor(c(rep("liver_3m", 3), rep("liver_29m", 3)))
+coldata<- data.frame(row.names=colnames(cts_SQuIRE_TOTcounts_family), condition)
+View(coldata)
+
+### should return TRUE
+all(rownames(coldata) == colnames(cts_SQuIRE_TOTcounts_family))
+```
+
+## DEseq2
+##########################################################################################
+```
+library("DESeq2")
+dds_SQuIRE_TOTcounts_family <- DESeqDataSetFromMatrix(countData = cts_SQuIRE_TOTcounts_family,
+                              colData = coldata,
+                              design = ~ condition)
+dds_SQuIRE_TOTcounts_family
+
+dds_SQuIRE_TOTcounts_family <- DESeq(dds_SQuIRE_TOTcounts_family)
+View(assay(dds_SQuIRE_TOTcounts_family))
+```
+
+## extract normalized counts
+```
+library("dplyr")
+library("tibble")
+SQuIRE_normCounts_family <- counts(dds_SQuIRE_TOTcounts_family, normalized=TRUE)
+df_SQuIRE_normCounts_family <- as.data.frame(SQuIRE_normCounts_family)
+df_SQuIRE_normCounts_family <- df_SQuIRE_normCounts_family %>%
+  rownames_to_column(var = "gene_id") # move rownames as specific column
+View(df_SQuIRE_normCounts_family)
+
+df_SQuIRE_normCounts_family_TE_only <- df_SQuIRE_normCounts_family[26316:27109,]
+df_SQuIRE_normCounts_family_TE_only <- df_SQuIRE_normCounts_family_TE_only %>%
+  rename(TE_name = gene_id) # rename column using new_name = old_name syntax
+View(df_SQuIRE_normCounts_family_TE_only)
+# TE_name contains concatenated Subfamily:Family:Class
+```
+
+## Variance stabilizing transformation
+##########################################################################################
+## Get vsd for PCA
+```
+vsd_SQuIRE_TOTcounts_family <- vst(dds_SQuIRE_TOTcounts_family, blind=TRUE)
+vsd_SQuIRE_TOTcounts_family_Gene_only <- vsd_SQuIRE_TOTcounts_family[1:26315,]
+vsd_SQuIRE_TOTcounts_family_TE_only <- vsd_SQuIRE_TOTcounts_family[26316:27109,]
+
+# Principal Component Analysis on vst
+plotPCA(vsd_SQuIRE_TOTcounts_family, intgroup=c("condition"))
+plotPCA(vsd_SQuIRE_TOTcounts_family_Gene_only, intgroup=c("condition"))
+plotPCA(vsd_SQuIRE_TOTcounts_family_TE_only, intgroup=c("condition"))
+
+# export pdf plot on TE
+dir.create("./Results")
+dir.create("./Results/DEseq2")
+pdf("./Results/DEseq2/vsd_SQuIRE_TOTcounts_family_TE_only.pdf", onefile = FALSE, paper = "special", width = 10, height = 7.5)
+plotPCA(vsd_SQuIRE_TOTcounts_family_TE_only, intgroup=c("condition"))
+dev.off()
+```
+
+## compute Euclidian distance matrix
+##########################################################################################
+```
+sampleDists_SQuIRE_TOTcounts_family <- dist(t(assay(vsd_SQuIRE_TOTcounts_family)))
+sampleDists_SQuIRE_TOTcounts_family_Gene_only <- dist(t(assay(vsd_SQuIRE_TOTcounts_family[1:26315,])))
+sampleDists_SQuIRE_TOTcounts_family_TE_only <- dist(t(assay(vsd_SQuIRE_TOTcounts_family[26316:27109,])))
+
+library("RColorBrewer")
+colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+library("pheatmap")
+sampleDistMatrix_SQuIRE_TOTcounts_family <- as.matrix(sampleDists_SQuIRE_TOTcounts_family)
+pheatmap(sampleDistMatrix_SQuIRE_TOTcounts_family,
+         clustering_distance_rows=sampleDists_SQuIRE_TOTcounts_family,
+         clustering_distance_cols=sampleDists_SQuIRE_TOTcounts_family,
+         col=colors)
+sampleDistMatrix_SQuIRE_TOTcounts_family_Gene_only <- as.matrix(sampleDists_SQuIRE_TOTcounts_family_Gene_only)
+pheatmap(sampleDistMatrix_SQuIRE_TOTcounts_family_Gene_only,
+         clustering_distance_rows=sampleDists_SQuIRE_TOTcounts_family_Gene_only,
+         clustering_distance_cols=sampleDists_SQuIRE_TOTcounts_family_Gene_only,
+         col=colors)
+sampleDistMatrix_SQuIRE_TOTcounts_family_TE_only <- as.matrix(sampleDists_SQuIRE_TOTcounts_family_TE_only)
+pheatmap(sampleDistMatrix_SQuIRE_TOTcounts_family_TE_only,
+         clustering_distance_rows=sampleDists_SQuIRE_TOTcounts_family_TE_only,
+         clustering_distance_cols=sampleDists_SQuIRE_TOTcounts_family_TE_only,
+         col=colors)
+
+# export pdf plot on TE
+pdf("./Results/DEseq2/sampleDistMatrix_SQuIRE_TOTcounts_family_TE_only.pdf", onefile = FALSE, paper = "special", width = 10, height = 7.5)
+sampleDistMatrix_SQuIRE_TOTcounts_family_TE_only <- as.matrix(sampleDists_SQuIRE_TOTcounts_family_TE_only)
+pheatmap(sampleDistMatrix_SQuIRE_TOTcounts_family_TE_only,
+         clustering_distance_rows=sampleDists_SQuIRE_TOTcounts_family_TE_only,
+         clustering_distance_cols=sampleDists_SQuIRE_TOTcounts_family_TE_only,
+         col=colors)
+dev.off()
+```
+
+## calculate DE
+## the second group name represent the ctrl vs. which calculate difference
+##########################################################################################
+```
+res_SQuIRE_TOTcounts_family <- results(dds_SQuIRE_TOTcounts_family, contrast = c("condition","liver_29m", "liver_3m"))
+res_SQuIRE_TOTcounts_family
+summary(res_SQuIRE_TOTcounts_family)
+
+res_SQuIRE_TOTcounts_family_Gene_only <- res_SQuIRE_TOTcounts_family[1:26315,]
+res_SQuIRE_TOTcounts_family_TE_only <- res_SQuIRE_TOTcounts_family[26316:27109,]
+
+plotMA(res_SQuIRE_TOTcounts_family, ylim=c(-7,7), alpha = 0.05)
+plotMA(res_SQuIRE_TOTcounts_family_Gene_only, ylim=c(-7,7), alpha = 0.05)
+plotMA(res_SQuIRE_TOTcounts_family_TE_only, ylim=c(-7,7), alpha = 0.05)
+
+pdf("./Results/DEseq2/res_SQuIRE_TOTcounts_family_TE_only_MAplot.pdf", onefile = FALSE, paper = "special", width = 10, height = 7.5)
+plotMA(res_SQuIRE_TOTcounts_family_TE_only, ylim=c(-7,7), alpha = 0.05)
+dev.off()
+```
+
+## export DEseq2 results
+##########################################################################################
+```
+library("dplyr")
+library("tibble")
+SQuIRE_DESeq2_family <- as.data.frame(res_SQuIRE_TOTcounts_family)
+SQuIRE_DESeq2_family <- SQuIRE_DESeq2_family %>%
+  rownames_to_column(var = "gene_id") # move rownames as specific column
+View(SQuIRE_DESeq2_family)
+
+SQuIRE_DESeq2_family_TE_only <- SQuIRE_DESeq2_family[26316:27109,]
+SQuIRE_DESeq2_family_TE_only <- SQuIRE_DESeq2_family_TE_only %>%
+  rename(TE_name = gene_id) # rename column using new_name = old_name syntax
+View(SQuIRE_DESeq2_family_TE_only)
+# TE_name contains concatenated Subfamily:Family:Class
+```
+
+##########################################################################################
+##########################################################################################
+
+
+## preparation of merged dataframe
+##########################################################################################
+## merging with sort=FALSE keep the order of X list
+```
+DESeq2_normCounts_family_TE_only <- merge(SQuIRE_DESeq2_family_TE_only, df_SQuIRE_normCounts_family_TE_only, by = "TE_name", sort = FALSE)
+View(DESeq2_normCounts_family_TE_only)
+
+# Separate a column in multiple column base on special characters
+library("dplyr")
+library("tidyr")
+DESeq2_normCounts_family_TE_only <- DESeq2_normCounts_family_TE_only %>%
+  separate(TE_name, c("repName", "repFamily", "repClass"), sep = "([:])", extra = "merge", fill = "right", remove = FALSE)
+View(DESeq2_normCounts_family_TE_only)
+
+# count by Class of TE
+library("dplyr")
+DESeq2_normCounts_family_TE_only_count <- DESeq2_normCounts_family_TE_only %>%
+  group_by(repClass) %>% count()
+View(DESeq2_normCounts_family_TE_only_count)
+
+# subset by pvalue and count by Class of TE
+DESeq2_normCounts_family_TE_only_pvalue005 <- subset(DESeq2_normCounts_family_TE_only, pvalue< 0.05)
+View(DESeq2_normCounts_family_TE_only_pvalue005)
+DESeq2_normCounts_family_TE_only_pvalue005_count <- DESeq2_normCounts_family_TE_only_pvalue005 %>%
+  group_by(repClass) %>% count()
+View(DESeq2_normCounts_family_TE_only_pvalue005_count)
+```
+
+## heatmap on normalized counts
+##########################################################################################
+```
+library("pheatmap")
+dir.create("./Results/pheatmap")
+pdf("./Results/pheatmap/DESeq2_normCounts_family_TE_only_pvalue005.pdf", onefile = FALSE, paper = "special", width = 7, height = 6)
+pheatmap(DESeq2_normCounts_family_TE_only_pvalue005[,11:16], cluster_rows=TRUE, show_rownames=TRUE,
+         cluster_cols=FALSE, scale = "row", labels_row = DESeq2_normCounts_family_TE_only_pvalue005$TE_name)
+dev.off()
+```
+
+## Enhanced Volcano
+##########################################################################################
+## prep color function based on repClass
+```
+keyvals.colour <- ifelse(
+  DESeq2_normCounts_family_TE_only$pvalue > 0.05 , 'grey80', # is a lighter grey
+  ifelse(DESeq2_normCounts_family_TE_only$repClass == "DNA", 'orange',
+         ifelse(DESeq2_normCounts_family_TE_only$repClass == "LTR", 'purple1',
+                ifelse(DESeq2_normCounts_family_TE_only$repClass == "LINE", 'olivedrab1',
+                       ifelse(DESeq2_normCounts_family_TE_only$repClass == "SINE", 'dodgerblue1',
+                              'grey20')))))# anything else is the significant non-TEs
+keyvals.colour[is.na(keyvals.colour)] <- 'grey80'
+names(keyvals.colour)[keyvals.colour == 'grey80'] <- 'NotSig'
+names(keyvals.colour)[keyvals.colour == 'grey20'] <- 'not-TEs'
+names(keyvals.colour)[keyvals.colour == 'orange'] <- 'DNA'
+names(keyvals.colour)[keyvals.colour == 'purple1'] <- 'LTR'
+names(keyvals.colour)[keyvals.colour == 'olivedrab1'] <- 'LINE'
+names(keyvals.colour)[keyvals.colour == 'dodgerblue1'] <- 'SINE'
+View(keyvals.colour)
+
+library("EnhancedVolcano")
+dir.create("./Results/EnhancedVolcano")
+pdf("./Results/EnhancedVolcano/DESeq2_normCounts_family_TE_only_groupCol.pdf", onefile = FALSE, paper = "special", width = 7, height = 6)
+EnhancedVolcano(DESeq2_normCounts_family_TE_only,
+                lab = DESeq2_normCounts_family_TE_only$repName,
+                x = 'log2FoldChange',
+                y = 'pvalue',
+                xlim = c(-3.5, 3.5),
+                ylim = c(0, 9),
+                title = 'TE_DE_family',
+                subtitle = '29m VS. 3m livers',
+                pCutoff = 0.05,
+                FCcutoff = 0,
+                pointSize = 2.0,
+                labSize = 2.0,
+                colCustom = keyvals.colour,
+                colAlpha = 0.6,
+                legendPosition = 'bottom',
+                legendLabSize = 14,
+                legendIconSize = 4.0,
+                labCol = 'black',
+                labFace = 'bold',
+                drawConnectors = TRUE,
+                widthConnectors = 0.5,
+                max.overlaps = 30,
+                colConnectors = 'black')
+dev.off()
+```
+
+## B: DESeq2 and Visualization of TE counted by SQuIRE Locus specific
 
 # loading data
 ##############################################################################
@@ -438,266 +701,4 @@ plotTargetAnnotation(annot_GR_DESeq2_normCounts_locus_TE_only_pvalue005_LTR)
 dev.off()
 # take the numbers (with promoter > exon > intron precedence)
 annot_GR_DESeq2_normCounts_locus_TE_only_pvalue005_LTR
-```
-
-# DEseq2 and Visualization of TE counted by SQuIRE grouped by SubFamily Name
-
-## loading packages environment
-##############################################################################
-```
-.libPaths("/scratch/gencore/software/RStudio/TE_workshop_R/lib/R/library")
-.libPaths()
-
-# set up working directories changing to your netID
-setwd("/scratch/netID/TE_workshop/Analysis_Visualization")
-```
-
-## loading data
-##############################################################################
-```
-SQuIRE_TOTcounts_family <- read.delim("./Input_Data/SQuIRE_gene_subF_counttable.txt")
-View(SQuIRE_TOTcounts_family)
-```
-
-## preparation of dataframe
-##########################################################################################
-```
-library("dplyr")
-library("tibble")
-SQuIRE_TOTcounts_family <- SQuIRE_TOTcounts_family %>%
-  remove_rownames() %>% # this is needed if dataframe has been filtered already so the picked row numbers are considered rownames
-  column_to_rownames(var = "gene_id") %>% # move specific columns as rownames
-  select(liver_3m1_1.fastq, liver_3m2_1.fastq, liver_3m3_1.fastq,
-         liver_29m1_1.fastq, liver_29m2_1.fastq, liver_29m3_1.fastq) %>% # reorder columns as called
-  rename(liver_3m_1 = liver_3m1_1.fastq, liver_3m_2 = liver_3m2_1.fastq, liver_3m_3 = liver_3m3_1.fastq,
-         liver_29m_1 = liver_29m1_1.fastq, liver_29m_2 = liver_29m2_1.fastq, liver_29m_3 = liver_29m3_1.fastq) # rename columns as called
-View(SQuIRE_TOTcounts_family)
-cts_SQuIRE_TOTcounts_family <- as.matrix(SQuIRE_TOTcounts_family)
-```
-
-## preparation of annotation
-##########################################################################################
-```
-condition <- factor(c(rep("liver_3m", 3), rep("liver_29m", 3)))
-coldata<- data.frame(row.names=colnames(cts_SQuIRE_TOTcounts_family), condition)
-View(coldata)
-
-### should return TRUE
-all(rownames(coldata) == colnames(cts_SQuIRE_TOTcounts_family))
-```
-
-## DEseq2
-##########################################################################################
-```
-library("DESeq2")
-dds_SQuIRE_TOTcounts_family <- DESeqDataSetFromMatrix(countData = cts_SQuIRE_TOTcounts_family,
-                              colData = coldata,
-                              design = ~ condition)
-dds_SQuIRE_TOTcounts_family
-
-dds_SQuIRE_TOTcounts_family <- DESeq(dds_SQuIRE_TOTcounts_family)
-View(assay(dds_SQuIRE_TOTcounts_family))
-```
-
-## extract normalized counts
-```
-library("dplyr")
-library("tibble")
-SQuIRE_normCounts_family <- counts(dds_SQuIRE_TOTcounts_family, normalized=TRUE)
-df_SQuIRE_normCounts_family <- as.data.frame(SQuIRE_normCounts_family)
-df_SQuIRE_normCounts_family <- df_SQuIRE_normCounts_family %>%
-  rownames_to_column(var = "gene_id") # move rownames as specific column
-View(df_SQuIRE_normCounts_family)
-
-df_SQuIRE_normCounts_family_TE_only <- df_SQuIRE_normCounts_family[26316:27109,]
-df_SQuIRE_normCounts_family_TE_only <- df_SQuIRE_normCounts_family_TE_only %>%
-  rename(TE_name = gene_id) # rename column using new_name = old_name syntax
-View(df_SQuIRE_normCounts_family_TE_only)
-# TE_name contains concatenated Subfamily:Family:Class
-```
-
-## Variance stabilizing transformation
-##########################################################################################
-## Get vsd for PCA
-```
-vsd_SQuIRE_TOTcounts_family <- vst(dds_SQuIRE_TOTcounts_family, blind=TRUE)
-vsd_SQuIRE_TOTcounts_family_Gene_only <- vsd_SQuIRE_TOTcounts_family[1:26315,]
-vsd_SQuIRE_TOTcounts_family_TE_only <- vsd_SQuIRE_TOTcounts_family[26316:27109,]
-
-# Principal Component Analysis on vst
-plotPCA(vsd_SQuIRE_TOTcounts_family, intgroup=c("condition"))
-plotPCA(vsd_SQuIRE_TOTcounts_family_Gene_only, intgroup=c("condition"))
-plotPCA(vsd_SQuIRE_TOTcounts_family_TE_only, intgroup=c("condition"))
-
-# export pdf plot on TE
-dir.create("./Results")
-dir.create("./Results/DEseq2")
-pdf("./Results/DEseq2/vsd_SQuIRE_TOTcounts_family_TE_only.pdf", onefile = FALSE, paper = "special", width = 10, height = 7.5)
-plotPCA(vsd_SQuIRE_TOTcounts_family_TE_only, intgroup=c("condition"))
-dev.off()
-```
-
-## compute Euclidian distance matrix
-##########################################################################################
-```
-sampleDists_SQuIRE_TOTcounts_family <- dist(t(assay(vsd_SQuIRE_TOTcounts_family)))
-sampleDists_SQuIRE_TOTcounts_family_Gene_only <- dist(t(assay(vsd_SQuIRE_TOTcounts_family[1:26315,])))
-sampleDists_SQuIRE_TOTcounts_family_TE_only <- dist(t(assay(vsd_SQuIRE_TOTcounts_family[26316:27109,])))
-
-library("RColorBrewer")
-colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
-library("pheatmap")
-sampleDistMatrix_SQuIRE_TOTcounts_family <- as.matrix(sampleDists_SQuIRE_TOTcounts_family)
-pheatmap(sampleDistMatrix_SQuIRE_TOTcounts_family,
-         clustering_distance_rows=sampleDists_SQuIRE_TOTcounts_family,
-         clustering_distance_cols=sampleDists_SQuIRE_TOTcounts_family,
-         col=colors)
-sampleDistMatrix_SQuIRE_TOTcounts_family_Gene_only <- as.matrix(sampleDists_SQuIRE_TOTcounts_family_Gene_only)
-pheatmap(sampleDistMatrix_SQuIRE_TOTcounts_family_Gene_only,
-         clustering_distance_rows=sampleDists_SQuIRE_TOTcounts_family_Gene_only,
-         clustering_distance_cols=sampleDists_SQuIRE_TOTcounts_family_Gene_only,
-         col=colors)
-sampleDistMatrix_SQuIRE_TOTcounts_family_TE_only <- as.matrix(sampleDists_SQuIRE_TOTcounts_family_TE_only)
-pheatmap(sampleDistMatrix_SQuIRE_TOTcounts_family_TE_only,
-         clustering_distance_rows=sampleDists_SQuIRE_TOTcounts_family_TE_only,
-         clustering_distance_cols=sampleDists_SQuIRE_TOTcounts_family_TE_only,
-         col=colors)
-
-# export pdf plot on TE
-pdf("./Results/DEseq2/sampleDistMatrix_SQuIRE_TOTcounts_family_TE_only.pdf", onefile = FALSE, paper = "special", width = 10, height = 7.5)
-sampleDistMatrix_SQuIRE_TOTcounts_family_TE_only <- as.matrix(sampleDists_SQuIRE_TOTcounts_family_TE_only)
-pheatmap(sampleDistMatrix_SQuIRE_TOTcounts_family_TE_only,
-         clustering_distance_rows=sampleDists_SQuIRE_TOTcounts_family_TE_only,
-         clustering_distance_cols=sampleDists_SQuIRE_TOTcounts_family_TE_only,
-         col=colors)
-dev.off()
-```
-
-## calculate DE
-## the second group name represent the ctrl vs. which calculate difference
-##########################################################################################
-```
-res_SQuIRE_TOTcounts_family <- results(dds_SQuIRE_TOTcounts_family, contrast = c("condition","liver_29m", "liver_3m"))
-res_SQuIRE_TOTcounts_family
-summary(res_SQuIRE_TOTcounts_family)
-
-res_SQuIRE_TOTcounts_family_Gene_only <- res_SQuIRE_TOTcounts_family[1:26315,]
-res_SQuIRE_TOTcounts_family_TE_only <- res_SQuIRE_TOTcounts_family[26316:27109,]
-
-plotMA(res_SQuIRE_TOTcounts_family, ylim=c(-7,7), alpha = 0.05)
-plotMA(res_SQuIRE_TOTcounts_family_Gene_only, ylim=c(-7,7), alpha = 0.05)
-plotMA(res_SQuIRE_TOTcounts_family_TE_only, ylim=c(-7,7), alpha = 0.05)
-
-pdf("./Results/DEseq2/res_SQuIRE_TOTcounts_family_TE_only_MAplot.pdf", onefile = FALSE, paper = "special", width = 10, height = 7.5)
-plotMA(res_SQuIRE_TOTcounts_family_TE_only, ylim=c(-7,7), alpha = 0.05)
-dev.off()
-```
-
-## export DEseq2 results
-##########################################################################################
-```
-library("dplyr")
-library("tibble")
-SQuIRE_DESeq2_family <- as.data.frame(res_SQuIRE_TOTcounts_family)
-SQuIRE_DESeq2_family <- SQuIRE_DESeq2_family %>%
-  rownames_to_column(var = "gene_id") # move rownames as specific column
-View(SQuIRE_DESeq2_family)
-
-SQuIRE_DESeq2_family_TE_only <- SQuIRE_DESeq2_family[26316:27109,]
-SQuIRE_DESeq2_family_TE_only <- SQuIRE_DESeq2_family_TE_only %>%
-  rename(TE_name = gene_id) # rename column using new_name = old_name syntax
-View(SQuIRE_DESeq2_family_TE_only)
-# TE_name contains concatenated Subfamily:Family:Class
-```
-
-##########################################################################################
-##########################################################################################
-
-
-## preparation of merged dataframe
-##########################################################################################
-## merging with sort=FALSE keep the order of X list
-```
-DESeq2_normCounts_family_TE_only <- merge(SQuIRE_DESeq2_family_TE_only, df_SQuIRE_normCounts_family_TE_only, by = "TE_name", sort = FALSE)
-View(DESeq2_normCounts_family_TE_only)
-
-# Separate a column in multiple column base on special characters
-library("dplyr")
-library("tidyr")
-DESeq2_normCounts_family_TE_only <- DESeq2_normCounts_family_TE_only %>%
-  separate(TE_name, c("repName", "repFamily", "repClass"), sep = "([:])", extra = "merge", fill = "right", remove = FALSE)
-View(DESeq2_normCounts_family_TE_only)
-
-# count by Class of TE
-library("dplyr")
-DESeq2_normCounts_family_TE_only_count <- DESeq2_normCounts_family_TE_only %>%
-  group_by(repClass) %>% count()
-View(DESeq2_normCounts_family_TE_only_count)
-
-# subset by pvalue and count by Class of TE
-DESeq2_normCounts_family_TE_only_pvalue005 <- subset(DESeq2_normCounts_family_TE_only, pvalue< 0.05)
-View(DESeq2_normCounts_family_TE_only_pvalue005)
-DESeq2_normCounts_family_TE_only_pvalue005_count <- DESeq2_normCounts_family_TE_only_pvalue005 %>%
-  group_by(repClass) %>% count()
-View(DESeq2_normCounts_family_TE_only_pvalue005_count)
-```
-
-## heatmap on normalized counts
-##########################################################################################
-```
-library("pheatmap")
-dir.create("./Results/pheatmap")
-pdf("./Results/pheatmap/DESeq2_normCounts_family_TE_only_pvalue005.pdf", onefile = FALSE, paper = "special", width = 7, height = 6)
-pheatmap(DESeq2_normCounts_family_TE_only_pvalue005[,11:16], cluster_rows=TRUE, show_rownames=TRUE,
-         cluster_cols=FALSE, scale = "row", labels_row = DESeq2_normCounts_family_TE_only_pvalue005$TE_name)
-dev.off()
-```
-
-## Enhanced Volcano
-##########################################################################################
-## prep color function based on repClass
-```
-keyvals.colour <- ifelse(
-  DESeq2_normCounts_family_TE_only$pvalue > 0.05 , 'grey80', # is a lighter grey
-  ifelse(DESeq2_normCounts_family_TE_only$repClass == "DNA", 'orange',
-         ifelse(DESeq2_normCounts_family_TE_only$repClass == "LTR", 'purple1',
-                ifelse(DESeq2_normCounts_family_TE_only$repClass == "LINE", 'olivedrab1',
-                       ifelse(DESeq2_normCounts_family_TE_only$repClass == "SINE", 'dodgerblue1',
-                              'grey20')))))# anything else is the significant non-TEs
-keyvals.colour[is.na(keyvals.colour)] <- 'grey80'
-names(keyvals.colour)[keyvals.colour == 'grey80'] <- 'NotSig'
-names(keyvals.colour)[keyvals.colour == 'grey20'] <- 'not-TEs'
-names(keyvals.colour)[keyvals.colour == 'orange'] <- 'DNA'
-names(keyvals.colour)[keyvals.colour == 'purple1'] <- 'LTR'
-names(keyvals.colour)[keyvals.colour == 'olivedrab1'] <- 'LINE'
-names(keyvals.colour)[keyvals.colour == 'dodgerblue1'] <- 'SINE'
-View(keyvals.colour)
-
-library("EnhancedVolcano")
-dir.create("./Results/EnhancedVolcano")
-pdf("./Results/EnhancedVolcano/DESeq2_normCounts_family_TE_only_groupCol.pdf", onefile = FALSE, paper = "special", width = 7, height = 6)
-EnhancedVolcano(DESeq2_normCounts_family_TE_only,
-                lab = DESeq2_normCounts_family_TE_only$repName,
-                x = 'log2FoldChange',
-                y = 'pvalue',
-                xlim = c(-3.5, 3.5),
-                ylim = c(0, 9),
-                title = 'TE_DE_family',
-                subtitle = '29m VS. 3m livers',
-                pCutoff = 0.05,
-                FCcutoff = 0,
-                pointSize = 2.0,
-                labSize = 2.0,
-                colCustom = keyvals.colour,
-                colAlpha = 0.6,
-                legendPosition = 'bottom',
-                legendLabSize = 14,
-                legendIconSize = 4.0,
-                labCol = 'black',
-                labFace = 'bold',
-                drawConnectors = TRUE,
-                widthConnectors = 0.5,
-                max.overlaps = 30,
-                colConnectors = 'black')
-dev.off()
 ```
