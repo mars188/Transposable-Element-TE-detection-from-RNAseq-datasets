@@ -139,8 +139,9 @@ squire Call \
 ##############################################################################
 ## download and save Analysis_Visualization folder
 ## set up working directories changing to your local path were you saved Analysis_Visualization folder
-setwd("/<yourPath>/Analysis_Visualization")
-
+```
+setwd("/yourPath/Analysis_Visualization")
+```
 ## loading data
 ##############################################################################
 ```
