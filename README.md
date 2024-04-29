@@ -135,16 +135,11 @@ squire Call \
 # PART 2: Data visulization 
 ## A: DESeq2 and visualization of TE counted by SQuIRE grouped by SubFamily
 
-
-## loading packages environment
+## download data and set working directory
 ##############################################################################
-```
-.libPaths("/scratch/gencore/software/RStudio/TE_workshop_R/lib/R/library")
-.libPaths()
-
-# set up working directories changing to your netID
-setwd("/scratch/netID/TE_workshop/Analysis_Visualization")
-```
+## download and save Analysis_Visualization folder
+## set up working directories changing to your local path were you saved Analysis_Visualization folder
+setwd("/<yourPath>/Analysis_Visualization")
 
 ## loading data
 ##############################################################################
